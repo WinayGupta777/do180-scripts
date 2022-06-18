@@ -1,0 +1,47 @@
+#base image
+FROM ubi8/ubi:8.3
+
+
+# Set the ARG
+ARG NEXUS_VERSION=2.14.3-02
+
+# set the environment variable
+ENV   NEXUS_HOME   /opt/nexus
+
+# Install the java
+RUN 	yum install -y --setopt=tsflags=nodocs java-1.8.0-openjdk-devel   && \
+	yum clean all -y
+
+# Run a command
+RUN	groupadd -r nexus -f -g 1001  && \
+	useradd -u 1001 -r -g nexus -m -d ${NEXUS_HOME} \
+        	-s /sbin/nologin \
+	        -c "Nexus User" nexus  && \
+	chmod 775 ${NEXUS_HOME}/
+
+#Unpack
+ADD nexus-2.14.3-02-bundle.tar.gz    ${NEXUS_HOME}/
+
+
+#Add the file 
+COPY nexus-start.sh   ${NEXUS_HOME}/
+
+#Run a command | Mind the space
+RUN	ln -s ${NEXUS_HOME}/nexus-${NEXUS_VERSION}    ${NEXUS_HOME}/nexus2   && \
+	chown -R 1001:1001  ${NEXUS_HOME}
+
+#run as the nexus user
+USER nexus
+
+#working directory
+WORKDIR  /opt/nexus
+
+
+#volume mount point
+VOLUME  ["/opt/nexus/sonatype-work"]
+
+
+#default container command
+CMD [ "sh", "nexus-start.sh"  ]
+
+
