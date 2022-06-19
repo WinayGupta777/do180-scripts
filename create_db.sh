@@ -1,0 +1,1 @@
+podman run -dit  --pod new:webpod  -p 8080:80  --name db  -e MYSQL_USER=vinay  -e MYSQL_PASSWORD=redhat -e MYSQL_DATABASE=mydb -e MYSQL_ROOT_PASSWORD=redhat  registry.redhat.io/rhel8/mariadb-103:1-102
